@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 part of 'homepage_bloc.dart';
 
 class HomepageState extends Equatable {
@@ -6,16 +8,25 @@ class HomepageState extends Equatable {
   final XFile? pickedImage;
   final double opacity;
   final Uint8List? response;
-  const HomepageState({
+  List<String> removedBgs;
+
+  HomepageState({
     this.response,
     this.loadingRemovedBg = false,
     this.backgroundRemoved = false,
     this.opacity = 0.5,
     this.pickedImage,
+    required this.removedBgs,
   });
 
-  HomepageState changeImageState({XFile? pickedImage}) {
-    return HomepageState(pickedImage: pickedImage);
+  HomepageState changeImageState({
+    XFile? pickedImage,
+    List<String>? removedBgs,
+  }) {
+    return HomepageState(
+      pickedImage: pickedImage,
+      removedBgs: removedBgs ?? this.removedBgs,
+    );
   }
 
   HomepageState copyWith(
@@ -23,6 +34,7 @@ class HomepageState extends Equatable {
       Uint8List? response,
       bool? loadingRemovedBg,
       bool? backgroundRemoved,
+      List<String>? removedBgs,
       XFile? pickedImage}) {
     return HomepageState(
       pickedImage: pickedImage ?? this.pickedImage,
@@ -30,10 +42,17 @@ class HomepageState extends Equatable {
       loadingRemovedBg: loadingRemovedBg ?? this.loadingRemovedBg,
       response: response ?? this.response,
       opacity: opacity ?? this.opacity,
+      removedBgs: removedBgs ?? this.removedBgs,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [backgroundRemoved, pickedImage, opacity, response, loadingRemovedBg];
+  List<Object?> get props => [
+        backgroundRemoved,
+        pickedImage,
+        opacity,
+        response,
+        loadingRemovedBg,
+        removedBgs
+      ];
 }

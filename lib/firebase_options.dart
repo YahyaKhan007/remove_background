@@ -56,20 +56,20 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBqHn2IH4EUhUMdJEnOjo6i6s5pf-0bssA',
-    appId: '1:755980243469:android:cd2f77ebda764dd5ccbb44',
-    messagingSenderId: '755980243469',
-    projectId: 'background-remover-bfd68',
-    storageBucket: 'background-remover-bfd68.appspot.com',
+    apiKey: 'AIzaSyDSie2j_0_pxhBdk-ycgC0X0aFAjb2wA_0',
+    appId: '1:906181049338:android:e8ee7246927341fc0b8243',
+    messagingSenderId: '906181049338',
+    projectId: 'remove-bg-9850c',
+    storageBucket: 'remove-bg-9850c.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAb8xPmJgchGSjdgz51Bzitnw_MEuNqUCA',
-    appId: '1:755980243469:ios:4c4fe885d8495db0ccbb44',
-    messagingSenderId: '755980243469',
-    projectId: 'background-remover-bfd68',
-    storageBucket: 'background-remover-bfd68.appspot.com',
-    iosClientId: '755980243469-0gpk00a8u19hughccpmj1nmbda108a1l.apps.googleusercontent.com',
-    iosBundleId: 'com.example.backgroundRemover',
+    apiKey: 'AIzaSyBMs8pv2nTrsCi0RlEpCGn-4jSv8_BbAtw',
+    appId: '1:906181049338:ios:0692cd6e205b218f0b8243',
+    messagingSenderId: '906181049338',
+    projectId: 'remove-bg-9850c',
+    storageBucket: 'remove-bg-9850c.appspot.com',
+    iosBundleId: 'com.example.removeBg',
   );
+
 }

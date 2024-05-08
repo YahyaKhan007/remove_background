@@ -4,10 +4,8 @@ import 'package:remove_bg/views/screens/home_screen/widgets/neumorphic_style.dar
 
 import '../../../screens.dart';
 
-AppBar appBar(
-  BuildContext context,
-  GlobalKey<ScaffoldState> scaffoldKey
-) =>
+AppBar appBar(BuildContext context, int availableDiomonds,
+        GlobalKey<ScaffoldState> scaffoldKey) =>
     AppBar(
       backgroundColor: NeumorphicTheme.baseColor(context),
       actions: [
@@ -17,7 +15,7 @@ AppBar appBar(
             child: Row(
               children: [
                 NeumorphicText(
-                  "100",
+                  availableDiomonds.toString(),
                   style: const NeumorphicStyle(
                     depth: 4, //customize depth here
                     color: AppColors

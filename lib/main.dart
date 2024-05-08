@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:neumorphic_ui/neumorphic_ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './views/screens.dart';
 import 'package:flutter/material.dart';
@@ -9,15 +13,26 @@ import 'bloc/homepage_bloc/homepage_bloc.dart';
 
 import 'package:get/get.dart';
 
+import 'firebase_options.dart';
 import 'services/services.dart';
 import 'views/utils/image_picker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      // systemNavigationBarColor: Colors.blue, // navigation bar color
+      statusBarColor: NeumorphicColors.background // status bar color
+      ));
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // prefs.setInt("currentDiomonds", 15);
+  prefs.getInt('currentDiomonds') ?? prefs.setInt('currentDiomonds', 5);
+
   runApp(const MyApp());
 }
 
@@ -51,7 +66,7 @@ class MyApp extends StatelessWidget {
             ],
             child: GetMaterialApp(
               debugShowCheckedModeBanner: false,
-              title: 'park my car',
+              title: 'bg-remover',
               theme: ThemeData(
                 primaryColor: AppColors.kcPrimaryBackgroundColor,
                 primarySwatch: Colors.blue,

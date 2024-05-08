@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 part of 'auth_bloc.dart';
 
 class AuthState extends Equatable {
@@ -7,7 +9,7 @@ class AuthState extends Equatable {
   final bool showPassword;
   final UserModel? currentUserModel;
 
-  const AuthState({
+  AuthState({
     this.isLoading = false,
     this.isGoogleLoading = false,
     this.isAppleLoading = false,
@@ -20,12 +22,14 @@ class AuthState extends Equatable {
       UserModel? currentUserModel,
       bool? isGoogleLoading,
       bool? isAppleLoading,
+      
       bool? showPassword}) {
     return AuthState(
         isLoading: isLoading ?? this.isLoading,
         currentUserModel: currentUserModel ?? this.currentUserModel,
         isAppleLoading: isAppleLoading ?? this.isAppleLoading,
         isGoogleLoading: isGoogleLoading ?? this.isGoogleLoading,
+       
         showPassword: showPassword ?? this.showPassword);
   }
 
@@ -36,6 +40,6 @@ class AuthState extends Equatable {
         isGoogleLoading,
         isGoogleLoading,
         isAppleLoading,
-        showPassword
+        showPassword,
       ];
 }

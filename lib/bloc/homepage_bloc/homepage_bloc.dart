@@ -14,13 +14,14 @@ part 'homepage_state.dart';
 class HomepageBloc extends Bloc<HomepageEvent, HomepageState> {
   final ImagePickerUtils imagePickerUtils;
   HomepageBloc({required this.imagePickerUtils})
-      : super(const HomepageState()) {
+      : super(HomepageState(removedBgs: const [])) {
     on<RemoveBackground>(_removeBackgroundEvent);
     on<SelectedPhotoEvent>(_selectedPhotoEvent);
     on<RemovePhotoEvent>(_removePhotoEvent);
     on<GlowEffectEvent>(_glowEffectEvent);
     on<RemovedBackgroundSuccessfull>(_saveApiOutputResponse);
     on<ChangeLoading>(_changeLoading);
+    on<UpdateRemoveBackgroundsList>(_updateRemovedBackgroundList);
   }
 
   void _removeBackgroundEvent(
@@ -77,5 +78,10 @@ class HomepageBloc extends Bloc<HomepageEvent, HomepageState> {
         response: event.response,
         loadingRemovedBg: false,
         backgroundRemoved: true));
+  }
+
+  void _updateRemovedBackgroundList(
+      UpdateRemoveBackgroundsList event, Emitter<HomepageState> emit) {
+    emit(state.copyWith(removedBgs: event.removedBgs));
   }
 }

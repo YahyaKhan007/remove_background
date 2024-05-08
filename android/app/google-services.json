@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "906181049338",
+    "project_id": "remove-bg-9850c",
+    "storage_bucket": "remove-bg-9850c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906181049338:android:e8ee7246927341fc0b8243",
+        "android_client_info": {
+          "package_name": "com.example.remove_bg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSie2j_0_pxhBdk-ycgC0X0aFAjb2wA_0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

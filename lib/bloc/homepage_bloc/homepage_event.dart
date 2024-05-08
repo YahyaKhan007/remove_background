@@ -33,3 +33,8 @@ class ChangeLoading extends HomepageEvent {
   final bool isLoading;
   const ChangeLoading(this.isLoading);
 }
+
+class UpdateRemoveBackgroundsList extends HomepageEvent {
+  final List<String> removedBgs;
+  const UpdateRemoveBackgroundsList({required this.removedBgs});
+}

@@ -7,18 +7,22 @@ import 'dart:io';
 // import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:neumorphic_ui/neumorphic_ui.dart';
+import 'package:remove_bg/services/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../bloc/homepage_bloc/homepage_bloc.dart';
 import '../../../models/models.dart';
 import '../../screens.dart';
-import 'api_service/api_service.dart';
+import '../../../services/api_service/api_service.dart';
 import 'widgets/appbar.dart';
 import 'widgets/drawer_screen.dart';
+import 'widgets/full_page_image.dart';
 import 'widgets/gridview.dart';
 import 'widgets/neumorphic_style.dart';
-import 'widgets/photo_container.dart';
+import 'widgets/selected_unselected_widgets.dart';
 
 bool loading = true;
 
@@ -32,20 +36,29 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late GlobalKey<ScaffoldState> scaffoldKey;
-  late final AnimationController _controller =
-      AnimationController(vsync: this, duration: const Duration(seconds: 2));
 
   late Widget curentWidget;
   late double opacity;
   late Timer timer;
+  int availableDiomonds = 0;
 
   @override
   void initState() {
+    SharedPreferences.getInstance().then((prefs) {
+      // prefs.setStringList(key, value)
+      availableDiomonds = prefs.getInt('currentDiomonds')!;
+      prefs.getStringList('removedBgs');
+      var removedBgs = prefs.getStringList('removedBgs') ?? [];
+      context
+          .read<HomepageBloc>()
+          .add(UpdateRemoveBackgroundsList(removedBgs: removedBgs));
+    });
     super.initState();
-    // context.read<HomepageBloc>().add(const GlowEffectEvent());
     scaffoldKey = GlobalKey<ScaffoldState>();
     curentWidget = unSelectedWidget;
+
     opacity = 0.0;
+
     timer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
       setState(() {
         opacity += 0.2;
@@ -58,8 +71,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
-
     timer.cancel();
     super.dispose();
   }
@@ -68,162 +79,192 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: NeumorphicTheme.baseColor(context),
-      key: scaffoldKey,
-      drawer: CustomeDrawer(),
-      appBar: appBar(context, scaffoldKey),
-      body: SizedBox(
-        height: size.height,
-        width: size.width,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: size.height * 0.02,
-              ),
+    log("Available diomonds are ---->  $availableDiomonds");
 
-              diomondContainer(
-                  size: size,
-                  image: Image.asset(
-                    'assets/images/ads.png',
-                  ),
-                  title: "Watch Ads to earn diamonds",
-                  onTap: () {
-                    log("ads");
-                  }),
-              16.h.verticalSpace,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: NeumorphicTheme.baseColor(context),
+        key: scaffoldKey,
+        drawer: CustomeDrawer(),
+        appBar: appBar(
+          context,
+          availableDiomonds,
+          scaffoldKey,
+        ),
+        body: SizedBox(
+          height: size.height,
+          width: size.width,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: size.height * 0.02,
+                ),
 
-              // ~ for selection of photos
-              photoContainer(size: size, currentWidget: curentWidget),
+                // diomondContainer(
+                //     size: size,
+                //     image: Image.asset(
+                //       'assets/images/ads.png',
+                //     ),
+                //     title: "Watch Ads to earn diamonds",
+                //     onTap: () {
+                //       log("ads");
+                //     }),
+                // 16.h.verticalSpace,
 
-              BlocBuilder<HomepageBloc, HomepageState>(
-                builder: (context, state) {
-                  return GestureDetector(
-                    onTap: () async {
-                      if (state.pickedImage != null &&
-                          state.loadingRemovedBg == false &&
-                          state.backgroundRemoved == false) {
-                        // ~ loading true
-                        context.read<HomepageBloc>().add(
-                              const ChangeLoading(true),
-                            );
-                        // ~
+                // ~ for selection of photos
+                photoContainer(size: size, currentWidget: curentWidget),
 
-                        RemoveBgApiService apiService = RemoveBgApiService();
+                24.h.verticalHeight,
+                BlocBuilder<HomepageBloc, HomepageState>(
+                  builder: (context, state) {
+                    return GestureDetector(
+                      onTap: () async {
+                        if (state.pickedImage != null &&
+                            state.loadingRemovedBg == false &&
+                            state.backgroundRemoved == false) {
+                          if (availableDiomonds > 0) {
+                            // ~ loading true
+                            context.read<HomepageBloc>().add(
+                                  const ChangeLoading(true),
+                                );
+                            // ~
 
-                        final res = await apiService
-                            .removeBackground(state.pickedImage!.path);
+                            RemoveBgApiService apiService =
+                                RemoveBgApiService();
 
-                        if (res != null) {
-                          context
-                              .read<HomepageBloc>()
-                              .add(RemovedBackgroundSuccessfull(response: res));
-                        } else {
-                          // context.read<HomepageBloc>().add(
-                          //     const RemoveBackground(backgroundRemoved: false));
+                            final res = await apiService
+                                .removeBackground(state.pickedImage!.path);
+
+                            if (res != null) {
+                              context.read<HomepageBloc>().add(
+                                  RemovedBackgroundSuccessfull(response: res));
+                              availableDiomonds -= 1;
+                              // setState(() {});
+                              SharedPreferences.getInstance().then((prefs) {
+                                prefs.setInt(
+                                    'currentDiomonds', availableDiomonds);
+                              });
+                            } else {
+                              // context.read<HomepageBloc>().add(
+                              //     const RemoveBackground(backgroundRemoved: false));
+                            }
+                          } else {
+                            SnackBarService().showSnackbar(
+                                message: "You have no diomonds left",
+                                duration: 2,
+                                title: "Out of Diomonds",
+                                color: Colors.red,
+                                snackPosition: SnackPosition.TOP);
+                          }
                         }
-                      }
-                    },
-                    child: state.pickedImage == null || state.backgroundRemoved
-                        ? Neumorphic(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 16.w, vertical: 32.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16.w, vertical: 16.h),
-                            style: neumorphicStyle(),
-                            child: Center(
-                              child: Text(
-                                "Remove Background",
-                                style: TextStyle(
-                                    color: AppColors.kcPrimaryForgroundColor,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold),
+                      },
+                      child: state.pickedImage == null ||
+                              state.backgroundRemoved
+                          ? Neumorphic(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 16.w, vertical: 0.h),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16.w, vertical: 16.h),
+                              style: neumorphicStyle(),
+                              child: Center(
+                                child: Text(
+                                  "Remove Background",
+                                  style: TextStyle(
+                                      color: AppColors.kcPrimaryForgroundColor,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                          )
-                        : state.pickedImage != null &&
-                                state.loadingRemovedBg == true
-                            ? Neumorphic(
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 16.w, vertical: 32.h),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16.w, vertical: 8.h),
-                                style: neumorphicStyle(),
-                                child: SizedBox(
-                                    height: 40,
-                                    width: size.width,
-                                    child: LiquidLinearProgressIndicator(
-                                      value: 0.75, // Defaults to 0.5.
-                                      valueColor: const AlwaysStoppedAnimation(
-                                          NeumorphicColors
-                                              .darkBackground), // Defaults to the current Theme's accentColor.
-                                      backgroundColor: NeumorphicColors
-                                          .background, // Defaults to the current Theme's backgroundColor.
-                                      borderColor:
-                                          NeumorphicColors.darkBackground,
-                                      borderWidth: 5.0,
-                                      borderRadius: 12.0,
-                                      direction: Axis
-                                          .horizontal, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
-                                      center: Text("Loading..."),
-                                    )),
-                              )
-                            : Padding(
-                                padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 24)
-                                    .w,
-                                child: AnimatedOpacity(
-                                  opacity: opacity,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: Neumorphic(
-                                    style: neumorphicStyle(),
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16.w, vertical: 16.h),
-                                      child: Center(
-                                        child: Text(
-                                          "Remove Background",
-                                          style: TextStyle(
-                                              color: AppColors
-                                                  .kcPrimaryForgroundColor,
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.bold),
+                            )
+                          : state.pickedImage != null &&
+                                  state.loadingRemovedBg == true
+                              ? Neumorphic(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 16.w, vertical: 0.h),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.w, vertical: 8.h),
+                                  style: neumorphicStyle(),
+                                  child: SizedBox(
+                                      height: 40,
+                                      width: size.width,
+                                      child: LiquidLinearProgressIndicator(
+                                        value: 0.75, // Defaults to 0.5.
+                                        valueColor: const AlwaysStoppedAnimation(
+                                            NeumorphicColors
+                                                .darkBackground), // Defaults to the current Theme's accentColor.
+                                        backgroundColor: NeumorphicColors
+                                            .background, // Defaults to the current Theme's backgroundColor.
+                                        borderColor:
+                                            NeumorphicColors.darkBackground,
+                                        borderWidth: 5.0,
+                                        borderRadius: 12.0,
+                                        direction: Axis
+                                            .horizontal, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
+                                        center: const Text(
+                                            "Removing background...",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontStyle: FontStyle.italic)),
+                                      )),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 24)
+                                      .w,
+                                  child: AnimatedOpacity(
+                                    opacity: opacity,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: Neumorphic(
+                                      style: neumorphicStyle(),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w, vertical: 16.h),
+                                        child: Center(
+                                          child: Text(
+                                            "Remove Background",
+                                            style: TextStyle(
+                                                color: AppColors
+                                                    .kcPrimaryForgroundColor,
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
+                16.h.verticalHeight,
 
-// ^ Test Pictures
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Neumorphic(
-                  margin: EdgeInsets.only(left: 16.w),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  style: neumorphicStyle(),
-                  child: NeumorphicText(
-                    "Removed Backgrounds",
-                    style: const NeumorphicStyle(
-                      depth: 4, //customize depth here
-                      color: NeumorphicColors
-                          .defaultTextColor, //customize color here
-                    ),
-                    textStyle: NeumorphicTextStyle(
-                      fontSize: 14.sp, //customize size here
-                      // AND others usual text style properties (fontFamily, fontWeight, ...)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16).w,
+                    child: NeumorphicText(
+                      "Removed Backgrounds",
+                      style: const NeumorphicStyle(
+                        depth: 4, //customize depth here
+                        color: NeumorphicColors
+                            .defaultTextColor, //customize color here
+                      ),
+                      textStyle: NeumorphicTextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold
+                          //customize size here
+                          // AND others usual text style properties (fontFamily, fontWeight, ...)
+                          ),
                     ),
                   ),
                 ),
-              ),
-              // ~   Dummy Pictures
-              dummyPictures(size: size)
-            ],
+                8.h.verticalHeight,
+                // ~   Dummy Pictures
+                dummyPictures(size: size)
+              ],
+            ),
           ),
         ),
       ),
@@ -274,16 +315,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             child: state.pickedImage != null
                                 ? Stack(
                                     children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(16.r),
-                                            topRight: Radius.circular(16.r)),
-                                        child: SizedBox(
-                                          width: size.width * 0.4,
-                                          height: size.height * 0.28,
-                                          child: Image.file(
-                                            File(state.pickedImage!.path),
-                                            fit: BoxFit.cover,
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.to(
+                                              () => FullScreenImage(
+                                                    imagePath:
+                                                        state.pickedImage!.path,
+                                                  ),
+                                              duration:
+                                                  const Duration(seconds: 1));
+                                        },
+                                        child: Hero(
+                                          tag: state.pickedImage!.path,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(16.r),
+                                                topRight:
+                                                    Radius.circular(16.r)),
+                                            child: SizedBox(
+                                              width: size.width * 0.4,
+                                              height: size.height * 0.28,
+                                              child: Image.file(
+                                                File(state.pickedImage!.path),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),

@@ -16,7 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService authService;
   final DataBaseService dataBaseService;
   AuthBloc(this.authService, this.dataBaseService)
-      : super(const AuthState(currentUserModel: null)) {
+      : super(AuthState(currentUserModel: null)) {
     on<GotoRegisterationScreenEvent>(_gotoRegisterationScreen);
     on<GotoLoginScreenEvent>(_gotoLoginSceen);
     on<GoogleLoginEvent>(_googleLoginEvent);
