@@ -17,6 +17,7 @@ Widget dummyPictures({required Size size}) {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8).w,
           child: GridView.builder(
               itemCount: state.removedBgs.length,
+              reverse: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   mainAxisSpacing: 10.w,
@@ -25,10 +26,11 @@ Widget dummyPictures({required Size size}) {
                 return GestureDetector(
                   onTap: () {
                     Get.to(
-                        () => FullScreenImage(
-                              imagePath: state.removedBgs[index],
-                            ),
-                        duration: const Duration(seconds: 1));
+                      () => FullScreenImage(
+                        imagePath: state.removedBgs[index],
+                      ),
+                      // duration: const Duration(milliseconds: 600)
+                    );
                   },
                   child: Neumorphic(
                     style: NeumorphicStyle(

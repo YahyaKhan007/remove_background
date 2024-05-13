@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../views/screens/home_screen/widgets/functions/reduce_imgae_size.dart';
 import '../../views/utils/image_picker.dart';
 
 part 'homepage_event.dart';
@@ -45,8 +47,9 @@ class HomepageBloc extends Bloc<HomepageEvent, HomepageState> {
       SelectedPhotoEvent event, Emitter<HomepageState> emit) async {
     final pickedImage = await imagePickerUtils.pickImageFromGallery();
     if (pickedImage != null) {
-      emit(state.changeImageState(pickedImage: pickedImage));
-      log('image has been Selected');
+      emit(state.changeImageState(
+        pickedImage: pickedImage,
+      ));
     }
   }
 

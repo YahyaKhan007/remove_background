@@ -38,3 +38,8 @@ class UpdateRemoveBackgroundsList extends HomepageEvent {
   final List<String> removedBgs;
   const UpdateRemoveBackgroundsList({required this.removedBgs});
 }
+
+class UpdateCompressedImage extends HomepageEvent {
+  final File compressedImage;
+  const UpdateCompressedImage({required this.compressedImage});
+}

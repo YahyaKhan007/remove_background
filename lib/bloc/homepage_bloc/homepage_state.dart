@@ -6,6 +6,7 @@ class HomepageState extends Equatable {
   final bool backgroundRemoved;
   final bool loadingRemovedBg;
   final XFile? pickedImage;
+  final File? compressedImage;
   final double opacity;
   final Uint8List? response;
   List<String> removedBgs;
@@ -16,6 +17,7 @@ class HomepageState extends Equatable {
     this.backgroundRemoved = false,
     this.opacity = 0.5,
     this.pickedImage,
+    this.compressedImage,
     required this.removedBgs,
   });
 
@@ -29,15 +31,18 @@ class HomepageState extends Equatable {
     );
   }
 
-  HomepageState copyWith(
-      {double? opacity,
-      Uint8List? response,
-      bool? loadingRemovedBg,
-      bool? backgroundRemoved,
-      List<String>? removedBgs,
-      XFile? pickedImage}) {
+  HomepageState copyWith({
+    double? opacity,
+    Uint8List? response,
+    bool? loadingRemovedBg,
+    bool? backgroundRemoved,
+    List<String>? removedBgs,
+    XFile? pickedImage,
+    File? compressedImage,
+  }) {
     return HomepageState(
       pickedImage: pickedImage ?? this.pickedImage,
+      compressedImage: compressedImage ?? this.compressedImage,
       backgroundRemoved: backgroundRemoved ?? this.backgroundRemoved,
       loadingRemovedBg: loadingRemovedBg ?? this.loadingRemovedBg,
       response: response ?? this.response,
@@ -50,6 +55,7 @@ class HomepageState extends Equatable {
   List<Object?> get props => [
         backgroundRemoved,
         pickedImage,
+        compressedImage,
         opacity,
         response,
         loadingRemovedBg,

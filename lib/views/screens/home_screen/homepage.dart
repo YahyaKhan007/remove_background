@@ -20,6 +20,7 @@ import '../../../services/api_service/api_service.dart';
 import 'widgets/appbar.dart';
 import 'widgets/drawer_screen.dart';
 import 'widgets/full_page_image.dart';
+import 'widgets/functions/reduce_imgae_size.dart';
 import 'widgets/gridview.dart';
 import 'widgets/neumorphic_style.dart';
 import 'widgets/selected_unselected_widgets.dart';
@@ -91,6 +92,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           availableDiomonds,
           scaffoldKey,
         ),
+        // bottomSheet: Container(
+        //   height: size.height * 0.9,
+        //   width: size.width,
+        //   color: Colors.black,
+        // ),
         body: SizedBox(
           height: size.height,
           width: size.width,
@@ -100,17 +106,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 SizedBox(
                   height: size.height * 0.02,
                 ),
-
-                // diomondContainer(
-                //     size: size,
-                //     image: Image.asset(
-                //       'assets/images/ads.png',
-                //     ),
-                //     title: "Watch Ads to earn diamonds",
-                //     onTap: () {
-                //       log("ads");
-                //     }),
-                // 16.h.verticalSpace,
 
                 // ~ for selection of photos
                 photoContainer(size: size, currentWidget: curentWidget),
@@ -292,10 +287,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     : Alignment.center,
                 duration: const Duration(milliseconds: 500),
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     context
                         .read<HomepageBloc>()
                         .add(const SelectedPhotoEvent());
+
+                    
                   },
                   child: Neumorphic(
                     style: neumorphicStyle(),
@@ -488,59 +485,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         );
       },
-    );
-  }
-
-  Widget diomondContainer(
-      {required Size size,
-      required Image image,
-      required String title,
-      VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Neumorphic(
-        padding: EdgeInsets.symmetric(vertical: 12.h),
-        margin: EdgeInsets.symmetric(horizontal: 16.h),
-        style: neumorphicStyle(),
-        child: Row(
-          children: [
-            Expanded(
-                flex: 2,
-                child: NeumorphicIcon(
-                  Icons.play_circle,
-                  style: const NeumorphicStyle(
-                      color: NeumorphicColors.defaultTextColor),
-                  size: 30.r,
-                )),
-            Container(
-              width: 2,
-              color: Colors.black,
-            ),
-            4.horizontalSpace,
-            Expanded(
-                flex: 6,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w),
-                  child: FittedBox(
-                    alignment: Alignment.centerLeft,
-                    fit: BoxFit.scaleDown,
-                    child: NeumorphicText(
-                      title,
-                      style: const NeumorphicStyle(
-                        depth: 4, //customize depth here
-                        color: NeumorphicColors
-                            .defaultTextColor, //customize color here
-                      ),
-                      textStyle: NeumorphicTextStyle(
-                        fontSize: 14.sp, //customize size here
-                        // AND others usual text style properties (fontFamily, fontWeight, ...)
-                      ),
-                    ),
-                  ),
-                ))
-          ],
-        ),
-      ),
     );
   }
 }
